@@ -10,6 +10,7 @@ Route::get('/', function () {
 /*
  * 商品関連
  */
+Route::get('items/search','ItemController@search')->name('items.search');
 Route::resource('items', 'ItemController');
 Route::get('/items/create', 'ItemController@create')->name('items.create');
 Route::post('items/store', 'ItemController@store')->name('items.store');
@@ -17,6 +18,7 @@ Route::post('items/store', 'ItemController@store')->name('items.store');
 /*
  * カテゴリ関連
  */
+Route::get('categories/search', 'CategoryController@search')->name('categories.search');
 Route::resource('categories', 'CategoryController');
 Route::get('categories/create', 'CategoryController@create')->name('categories.create');
 Route::post('categories/store', 'CategoryController@store')->name('categories.store');

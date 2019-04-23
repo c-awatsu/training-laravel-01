@@ -2,20 +2,23 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreCategory;
+use App\Http\Requests\UpdateCategory;
+use Exception;
+use App\category;
 use Illuminate\Http\Request;
-use App\Category;
-use Illuminate\Validation\Rule;
+use Illuminate\Http\Response;
 
 class CategoryController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index()
     {
-        $categories = Category::paginate(10);
+        $categories = category::paginate(10);
 
         return view('categories.index', compact('categories'));
     }
@@ -23,7 +26,7 @@ class CategoryController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function create()
     {
@@ -33,16 +36,12 @@ class CategoryController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param StoreCategory $request
+     * @return Response
      */
-    public function store(Request $request)
+    public function store(StoreCategory $request)
     {
-        $request->validate([
-            'name'=>'required|unique:categories|max:255',
-        ]);
-
-        Category::create([
+        category::create([
             'name' => $request->input('name'),
         ]);
 
@@ -52,10 +51,10 @@ class CategoryController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param category $category
+     * @return Response
      */
-    public function show(Category $category)
+    public function show(category $category)
     {
         return view('categories.show', compact('category'));
     }
@@ -63,10 +62,10 @@ class CategoryController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param category $category
+     * @return Response
      */
-    public function edit(Category $category)
+    public function edit(category $category)
     {
         return view('categories.edit', compact('category'));
     }
@@ -74,20 +73,12 @@ class CategoryController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param UpdateCategory $request
+     * @param category $category
+     * @return Response
      */
-    public function update(Request $request,Category $category)
+    public function update(UpdateCategory $request, category $category)
     {
-        $request->validate([
-            'name'=>[
-                'required',
-                'max:255',
-                Rule::unique('categories')->ignore($category->id)
-            ]
-        ]);
-
         $category->update([
             'name'=>$request->input('name'),
         ]);
@@ -98,13 +89,20 @@ class CategoryController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param category $category
+     * @return Response
+     * @throws Exception
      */
-    public function destroy(Category $category)
+    public function destroy(category $category)
     {
         $category->delete();
 
         return redirect()->route('categories.index');
+    }
+
+    public function search(Request $request){
+        $searchWords = $request->input('searchWords');
+        $categories = Category::searchCategories($searchWords)->paginate(10);
+        return view('categories.index', compact('categories','searchWords'));
     }
 }

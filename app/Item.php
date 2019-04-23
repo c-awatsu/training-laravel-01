@@ -2,23 +2,26 @@
 
 namespace App;
 
+use Eloquent;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 /**
  * App\Item
  *
  * @property int $id
  * @property string $name
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Item newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Item newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Item query()
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Item whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Item whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Item whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\App\Item whereUpdatedAt($value)
- * @mixin \Eloquent
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @method static Builder|Item newModelQuery()
+ * @method static Builder|Item newQuery()
+ * @method static Builder|Item query()
+ * @method static Builder|Item whereCreatedAt($value)
+ * @method static Builder|Item whereId($value)
+ * @method static Builder|Item whereName($value)
+ * @method static Builder|Item whereUpdatedAt($value)
+ * @mixin Eloquent
  */
 class Item extends Model
 {
@@ -26,5 +29,13 @@ class Item extends Model
 
     public function category(){
         return $this->belongsTo('App\Category');
+    }
+
+    public function scopeSearchItems(Builder $query, $searchWord){
+        $splitedWord = preg_split("/[\s]+/", $searchWord);
+        foreach ($splitedWord as $word){
+            $query->where('name', 'LIKE', "%$word%");
+        }
+        return $query;
     }
 }
